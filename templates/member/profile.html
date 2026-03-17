@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+{% block content %}
+<div class="profile-page">
+  <div class="profile-header-card">
+    <div class="profile-avatar-lg">{{ member.name[0] }}</div>
+    <div class="profile-headline">
+      <h2>{{ member.name }}</h2>
+      <span class="badge badge-{{ 'danger' if member.is_expired else 'success' }} badge-lg">{{ 'Expired' if member.is_expired else 'Active Member' }}</span>
+      <p>{{ member.email }} &bull; {{ member.contact }}</p>
+    </div>
+  </div>
+  <div class="detail-grid">
+    <div class="detail-card"><h4><i class="fas fa-user"></i> Personal Info</h4><div class="detail-rows">
+      <div class="detail-row"><span>Age</span><strong>{{ member.age }}</strong></div>
+      <div class="detail-row"><span>Gender</span><strong>{{ member.gender }}</strong></div>
+      <div class="detail-row"><span>Contact</span><strong>{{ member.contact }}</strong></div>
+      <div class="detail-row"><span>Email</span><strong>{{ member.email }}</strong></div>
+    </div></div>
+    <div class="detail-card"><h4><i class="fas fa-tag"></i> Membership</h4><div class="detail-rows">
+      <div class="detail-row"><span>Plan</span><strong>{{ member.plan.plan_name if member.plan else 'N/A' }}</strong></div>
+      <div class="detail-row"><span>Duration</span><strong>{{ member.plan.duration }} months</strong></div>
+      <div class="detail-row"><span>Joined</span><strong>{{ member.join_date.strftime('%d %b %Y') if member.join_date else 'N/A' }}</strong></div>
+      <div class="detail-row"><span>Expiry</span><strong>{{ member.expiry_date.strftime('%d %b %Y') if member.expiry_date else 'N/A' }}</strong></div>
+      <div class="detail-row"><span>Trainer</span><strong>{{ member.trainer.name if member.trainer else 'Not Assigned' }}</strong></div>
+    </div></div>
+    <div class="detail-card"><h4><i class="fas fa-heartbeat"></i> Health Info</h4><p class="health-notes">{{ member.health_details or 'No health notes.' }}</p></div>
+  </div>
+</div>
+{% endblock %}

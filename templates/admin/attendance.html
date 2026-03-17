@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Attendance{% endblock %}
+{% block page_title %}Attendance Tracking{% endblock %}
+{% block content %}
+<div class="page-actions">
+  <form class="search-bar" method="GET">
+    <i class="fas fa-calendar"></i>
+    <input type="date" name="date" value="{{ filter_date }}">
+    <select name="member_id">
+      <option value="">All Members</option>
+      {% for m in members %}<option value="{{ m.id }}" {{ 'selected' if request.args.get('member_id')==m.id|string }}>{{ m.name }}</option>{% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{{ url_for('admin.attendance') }}" class="btn btn-outline">Today</a>
+  </form>
+  <a href="{{ url_for('admin.add_attendance') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Mark Attendance</a>
+</div>
+<div class="attendance-summary">
+  <div class="att-stat"><span>{{ records|length }}</span><p>Present Today</p></div>
+</div>
+<div class="data-card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead><tr><th>#</th><th>Member</th><th>Date</th><th>Check In</th><th>Check Out</th><th>Duration</th></tr></thead>
+      <tbody>
+        {% for r in records %}
+        <tr>
+          <td>{{ r.id }}</td>
+          <td><div class="cell-user"><div class="cell-avatar">{{ r.member.name[0] if r.member else '?' }}</div><strong>{{ r.member.name if r.member else 'N/A' }}</strong></div></td>
+          <td>{{ r.date.strftime('%d %b %Y') if r.date else '' }}</td>
+          <td><span class="time-badge check-in">{{ r.check_in or '-' }}</span></td>
+          <td><span class="time-badge check-out">{{ r.check_out or '-' }}</span></td>
+          <td>
+            {% if r.check_in and r.check_out %}
+              {% set ci = r.check_in.split(':') %}{% set co = r.check_out.split(':') %}
+              <small>~1 hr</small>
+            {% else %}<small>-</small>{% endif %}
+          </td>
+        </tr>
+        {% else %}<tr><td colspan="6" class="empty-row"><i class="fas fa-calendar-times"></i> No attendance for this date</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

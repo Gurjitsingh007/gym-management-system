@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Member — FlexCore{% endblock %}
+{% block page_title %}{{ action }} Member{% endblock %}
+{% block content %}
+<div class="page-header animate-in"><h2>{{ action }} Member</h2><p>{% if action == 'Add' %}Register a new gym member{% else %}Update member information{% endif %}</p></div>
+<div class="form-card animate-in">
+  <form method="POST">
+    <div class="row g-3">
+      <div class="col-md-6"><label class="gym-label">Full Name *</label><input type="text" name="name" class="gym-input" value="{{ member.name if member else '' }}" required placeholder="Enter full name"></div>
+      <div class="col-md-3"><label class="gym-label">Age</label><input type="number" name="age" class="gym-input" value="{{ member.age if member else '' }}" min="5" max="100" placeholder="Age"></div>
+      <div class="col-md-3"><label class="gym-label">Gender</label><select name="gender" class="gym-select"><option value="">Select</option><option value="Male" {% if member and member.gender == 'Male' %}selected{% endif %}>Male</option><option value="Female" {% if member and member.gender == 'Female' %}selected{% endif %}>Female</option><option value="Other" {% if member and member.gender == 'Other' %}selected{% endif %}>Other</option></select></div>
+      <div class="col-md-4"><label class="gym-label">Phone</label><input type="text" name="contact_phone" class="gym-input" value="{{ member.contact_phone if member else '' }}" placeholder="+91 XXXXX XXXXX"></div>
+      <div class="col-md-4"><label class="gym-label">Email</label><input type="email" name="contact_email" class="gym-input" value="{{ member.contact_email if member else '' }}" placeholder="member@email.com"></div>
+      <div class="col-md-4"><label class="gym-label">Join Date *</label><input type="date" name="join_date" class="gym-input" value="{{ member.join_date.isoformat() if member and member.join_date else '' }}" required></div>
+      <div class="col-md-8"><label class="gym-label">Address</label><input type="text" name="contact_address" class="gym-input" value="{{ member.contact_address if member else '' }}" placeholder="Full address"></div>
+      <div class="col-md-4"><label class="gym-label">Membership Plan</label><select name="plan_id" class="gym-select" id="planSelect"><option value="">No Plan</option>{% for p in plans %}<option value="{{ p.plan_id }}" data-fee="{{ p.fees }}" {% if member and member.plan_id == p.plan_id %}selected{% endif %}>{{ p.plan_name }} — Rs.{{ p.fees|int }}</option>{% endfor %}</select></div>
+      {% if action == 'Add' %}
+      <div class="col-md-4"><label class="gym-label">Payment Mode</label><select name="payment_mode" class="gym-select"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option></select></div>
+      {% endif %}
+      {% if action == 'Edit' %}
+      <div class="col-md-4"><label class="gym-label">Status</label><select name="is_active" class="gym-select"><option value="1" {% if member and member.is_active %}selected{% endif %}>Active</option><option value="" {% if member and not member.is_active %}selected{% endif %}>Inactive</option></select></div>
+      {% endif %}
+      <div class="col-12"><label class="gym-label">Health Details</label><textarea name="health_details" class="gym-textarea" rows="3" placeholder="Existing conditions, medications, allergies...">{{ member.health_details if member else '' }}</textarea></div>
+    </div>
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn-gym btn-primary-gym"><i class="bi bi-check-circle-fill"></i> {{ action }} Member</button>
+      <a href="{{ url_for('admin.members') }}" class="btn-gym btn-secondary-gym"><i class="bi bi-arrow-left"></i> Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

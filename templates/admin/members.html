@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Members — FlexCore{% endblock %}
+{% block page_title %}Member Management{% endblock %}
+{% block content %}
+<div class="page-header animate-in d-flex align-items-center justify-content-between flex-wrap gap-2">
+  <div><h2>Members</h2><p>Manage all gym members, their plans and status</p></div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('admin.export_members') }}" class="btn-gym btn-secondary-gym"><i class="bi bi-download"></i> Export CSV</a>
+    <a href="{{ url_for('admin.add_member') }}" class="btn-gym btn-primary-gym"><i class="bi bi-person-plus-fill"></i> Add Member</a>
+  </div>
+</div>
+<div class="form-card mb-4 animate-in" style="padding:16px 20px;">
+  <form method="GET" class="row g-2 align-items-end">
+    <div class="col-md-4">
+      <label class="gym-label">Search</label>
+      <div class="search-bar"><i class="bi bi-search"></i><input type="text" name="search" placeholder="Name or email..." value="{{ search }}"></div>
+    </div>
+    <div class="col-md-2">
+      <label class="gym-label">Gender</label>
+      <select name="gender" class="gym-select"><option value="">All</option><option value="Male" {% if gender == 'Male' %}selected{% endif %}>Male</option><option value="Female" {% if gender == 'Female' %}selected{% endif %}>Female</option></select>
+    </div>
+    <div class="col-md-2">
+      <label class="gym-label">Plan</label>
+      <select name="plan_id" class="gym-select"><option value="">All Plans</option>{% for p in plans %}<option value="{{ p.plan_id }}" {% if plan_id == p.plan_id|string %}selected{% endif %}>{{ p.plan_name }}</option>{% endfor %}</select>
+    </div>
+    <div class="col-md-2">
+      <label class="gym-label">Status</label>
+      <select name="status" class="gym-select"><option value="">All</option><option value="active" {% if status == 'active' %}selected{% endif %}>Active</option><option value="expired" {% if status == 'expired' %}selected{% endif %}>Expired</option><option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option></select>
+    </div>
+    <div class="col-md-2 d-flex gap-2">
+      <button type="submit" class="btn-gym btn-primary-gym w-100"><i class="bi bi-funnel-fill"></i> Filter</button>
+      <a href="{{ url_for('admin.members') }}" class="btn-gym btn-secondary-gym"><i class="bi bi-x"></i></a>
+    </div>
+  </form>
+</div>
+<div class="table-card animate-in">
+  <div class="table-header">
+    <div class="table-title"><i class="bi bi-people-fill me-2"></i>{{ members|length }} Members Found</div>
+  </div>
+  <div class="table-responsive">
+    <table class="gym-table">
+      <thead><tr><th>#</th><th>Member</th><th>Age/Gender</th><th>Contact</th><th>Plan</th><th>Join Date</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        {% for m in members %}
+        <tr>
+          <td style="color:var(--text2)">{{ m.member_id }}</td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <div class="member-avatar" style="background:rgba({% if m.gender == 'Male' %}79,172,254{% else %}199,125,255{% endif %},0.15);color:var(--{% if m.gender == 'Male' %}blue{% else %}purple{% endif %})">{{ m.name[0] }}</div>
+              <div><div style="color:var(--text);font-weight:600;font-size:.875rem">{{ m.name }}</div><div style="font-size:.72rem;color:var(--text2)">ID: {{ m.member_id }}</div></div>
+            </div>
+          </td>
+          <td><span class="badge-status {% if m.gender == 'Male' %}badge-male{% else %}badge-female{% endif %}">{{ m.gender or "—" }}</span><span style="color:var(--text2);font-size:.8rem;margin-left:4px">{{ m.age or '' }}</span></td>
+          <td><div style="font-size:.8rem">{% if m.contact_phone %}<div>{{ m.contact_phone }}</div>{% endif %}{% if m.contact_email %}<div style="color:var(--text2)">{{ m.contact_email }}</div>{% endif %}</div></td>
+          <td><span style="color:var(--text);font-size:.825rem;font-weight:500">{{ m.plan.plan_name if m.plan else "—" }}</span></td>
+          <td>{{ m.join_date|dateformat }}</td>
+          <td>{% if m.expiry_date %}{% if m.is_expired %}<span style="color:var(--accent);font-size:.8rem">{{ m.expiry_date|dateformat }}</span>{% elif m.days_until_expiry and m.days_until_expiry <= 7 %}<span style="color:var(--yellow);font-size:.8rem">{{ m.expiry_date|dateformat }}</span>{% else %}<span style="font-size:.8rem">{{ m.expiry_date|dateformat }}</span>{% endif %}{% else %}—{% endif %}</td>
+          <td>{% if not m.is_active %}<span class="badge-status badge-inactive">Inactive</span>{% elif m.is_expired %}<span class="badge-status badge-expired">Expired</span>{% elif m.days_until_expiry and m.days_until_expiry <= 7 %}<span class="badge-status badge-expiring">Expiring</span>{% else %}<span class="badge-status badge-active">Active</span>{% endif %}</td>
+          <td>
+            <div class="d-flex gap-1">
+              <a href="{{ url_for('admin.view_member', member_id=m.id) }}" class="btn-gym btn-secondary-gym btn-sm-gym"><i class="bi bi-eye"></i></a>
+              <a href="{{ url_for('admin.edit_member', member_id=m.id) }}" class="btn-gym btn-secondary-gym btn-sm-gym"><i class="bi bi-pencil"></i></a>
+              <form method="POST" action="{{ url_for('admin.delete_member', member_id=m.id) }}" onsubmit="return confirm('Deactivate {{ m.name }}?')"><button type="submit" class="btn-gym btn-danger-gym btn-sm-gym"><i class="bi bi-trash"></i></button></form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="text-center py-4" style="color:var(--text2)"><i class="bi bi-people" style="font-size:2rem;display:block;margin-bottom:8px"></i>No members found. <a href="{{ url_for('admin.add_member') }}" style="color:var(--accent)">Add one!</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

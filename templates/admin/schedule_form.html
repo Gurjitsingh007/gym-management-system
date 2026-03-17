@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}Add Schedule{% endblock %}
+{% block page_title %}Add Workout Schedule{% endblock %}
+{% block content %}
+<div class="form-page">
+  <div class="form-card">
+    <div class="form-card-header"><i class="fas fa-clock"></i><h2>Add Workout Schedule</h2></div>
+    <form method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Trainer *</label>
+          <select name="id" required>
+            <option value="">Select Trainer</option>
+            {% for t in trainers %}<option value="{{ t.id }}">{{ t.name }} — {{ t.specialization }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label>Workout Type</label>
+          <select name="workout_type">
+            {% for wt in ['Weight Training','Cardio','Yoga','HIIT','Zumba','CrossFit','Pilates','Boxing','Swimming','Cycling'] %}
+            <option>{{ wt }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Day of Week</label>
+          <select name="day_of_week">
+            {% for d in ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}<option>{{ d }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label>Time Slot</label>
+          <select name="time_slot">
+            {% for s in ['06:00-07:00','07:00-08:00','08:00-09:00','09:00-10:00','10:00-11:00','17:00-18:00','18:00-19:00','19:00-20:00','20:00-21:00'] %}<option>{{ s }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="form-group"><label>Capacity</label><input type="number" name="capacity" value="20" min="1" max="100"></div>
+      </div>
+      <div class="form-actions">
+        <a href="{{ url_for('admin.schedules') }}" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Schedule</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

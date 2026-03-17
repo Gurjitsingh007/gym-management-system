@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Payments{% endblock %}
+{% block page_title %}Payment Management{% endblock %}
+{% block content %}
+<div class="page-actions">
+  <form class="search-bar" method="GET">
+    <i class="fas fa-filter"></i>
+    <select name="status">
+      <option value="">All Status</option>
+      <option value="Paid" {% if request.args.get('status')=='Paid' %}selected{% endif %}>Paid</option>
+      <option value="Pending" {% if request.args.get('status')=='Pending' %}selected{% endif %}>Pending</option>
+      <option value="Failed" {% if request.args.get('status')=='Failed' %}selected{% endif %}>Failed</option>
+    </select>
+    <button type="submit" class="btn btn-primary">Filter</button>
+    <a href="{{ url_for('admin.payments') }}" class="btn btn-outline">Reset</a>
+  </form>
+  <div class="action-btns">
+    <a href="{{ url_for('admin.export_payments') }}" class="btn btn-outline"><i class="fas fa-download"></i> Export</a>
+    <a href="{{ url_for('admin.add_payment') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Payment</a>
+  </div>
+</div>
+<div class="data-card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead><tr><th>id</th><th>Member</th><th>Amount</th><th>Date</th><th>Mode</th><th>Status</th><th>Notes</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for p in payments %}
+        <tr>
+          <td>{{ p.id }}</td>
+          <td><div class="cell-user"><div class="cell-avatar">{{ p.member.name[0] if p.member else '?' }}</div><div><strong>{{ p.member.name if p.member else 'N/A' }}</strong></div></div></td>
+          <td><strong class="text-success">₹{{ "{:,.0f}".format(p.amount) }}</strong></td>
+          <td>{{ p.payment_date.strftime('%d %b %Y') if p.payment_date else 'N/A' }}</td>
+          <td><span class="badge badge-info">{{ p.payment_mode }}</span></td>
+          <td><span class="badge badge-{{ 'success' if p.status=='Paid' else ('danger' if p.status=='Failed' else 'warning') }}">{{ p.status }}</span></td>
+          <td><small>{{ p.notes or '-' }}</small></td>
+          <td>
+            <form method="POST" action="{{ url_for('admin.delete_payment', id=p.id) }}" onsubmit="return confirm('Delete payment?')">
+              <button class="btn-icon btn-delete"><i class="fas fa-trash"></i></button>
+            </form>
+          </td>
+        </tr>
+        {% else %}<tr><td colspan="8" class="empty-row">No payments found</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

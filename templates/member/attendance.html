@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}My Attendance{% endblock %}
+{% block page_title %}Attendance History{% endblock %}
+{% block content %}
+<div class="data-card"><div class="table-responsive"><table class="data-table">
+  <thead><tr><th>#</th><th>Date</th><th>Check In</th><th>Check Out</th></tr></thead>
+  <tbody>
+    {% for r in records %}<tr>
+      <td>{{ r.id }}</td>
+      <td>{{ r.date.strftime('%d %b %Y') if r.date else '' }}</td>
+      <td><span class="time-badge check-in">{{ r.check_in or '-' }}</span></td>
+      <td><span class="time-badge check-out">{{ r.check_out or '-' }}</span></td>
+    </tr>{% else %}<tr><td colspan="4" class="empty-row">No attendance records</td></tr>{% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

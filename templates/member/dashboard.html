@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Member Dashboard{% endblock %}
+{% block page_title %}Member Dashboard{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <div class="member-welcome">
+    <div class="welcome-avatar">{{ member.name[0] }}</div>
+    <div class="welcome-text">
+      <h2>Welcome back, {{ member.name.split()[0] }}!</h2>
+      <p>{{ member.plan.plan_name if member.plan else "No plan" }} &bull; {% if member.is_expired %}<span class="text-danger">Membership Expired</span>{% elif member.days_to_expiry <= 7 %}<span class="text-warning">Expires in {{ member.days_to_expiry }} day(s)</span>{% else %}<span class="text-success">Active — {{ member.days_to_expiry }} days left</span>{% endif %}</p>
+    </div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card card-blue"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-info"><div class="stat-value">{{ total_visits }}</div><div class="stat-label">Total Visits</div></div><div class="stat-bg-icon"><i class="fas fa-calendar-check"></i></div></div>
+    <div class="stat-card card-green"><div class="stat-icon"><i class="fas fa-rupee-sign"></i></div><div class="stat-info"><div class="stat-value">{{ member.payments|length }}</div><div class="stat-label">Payments Made</div></div><div class="stat-bg-icon"><i class="fas fa-rupee-sign"></i></div></div>
+    <div class="stat-card card-orange"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-info"><div class="stat-value">{{ schedules|length }}</div><div class="stat-label">Available Classes</div></div><div class="stat-bg-icon"><i class="fas fa-clock"></i></div></div>
+  </div>
+  <div class="charts-row">
+    <div class="section-card">
+      <div class="section-header"><h3><i class="fas fa-credit-card"></i> Recent Payments</h3><a href="{{ url_for('member.payments') }}" class="btn btn-sm btn-outline">View All</a></div>
+      <table class="mini-table"><thead><tr><th>Amount</th><th>Date</th><th>Mode</th><th>Status</th></tr></thead><tbody>
+        {% for p in payments %}<tr><td>&#8377;{{ "{:,.0f}".format(p.amount) }}</td><td>{{ p.payment_date }}</td><td>{{ p.payment_mode }}</td><td><span class="badge badge-{{ 'success' if p.status=='Paid' else 'warning' }}">{{ p.status }}</span></td></tr>{% else %}<tr><td colspan="4" class="empty-row">No payments</td></tr>{% endfor %}
+      </tbody></table>
+    </div>
+    <div class="section-card">
+      <div class="section-header"><h3><i class="fas fa-calendar-check"></i> Recent Attendance</h3><a href="{{ url_for('member.attendance') }}" class="btn btn-sm btn-outline">View All</a></div>
+      <table class="mini-table"><thead><tr><th>Date</th><th>Check In</th><th>Check Out</th></tr></thead><tbody>
+        {% for a in attendance %}<tr><td>{{ a.date }}</td><td>{{ a.check_in or '-' }}</td><td>{{ a.check_out or '-' }}</td></tr>{% else %}<tr><td colspan="3" class="empty-row">No attendance records</td></tr>{% endfor %}
+      </tbody></table>
+    </div>
+  </div>
+</div>
+{% endblock %}

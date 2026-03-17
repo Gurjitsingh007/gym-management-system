@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Add Schedule{% endblock %}
+{% block page_title %}Add Schedule{% endblock %}
+{% block content %}
+<div class="form-page"><div class="form-card"><div class="form-card-header"><i class="fas fa-clock"></i><h2>Add Workout Schedule</h2></div>
+<form method="POST"><div class="form-row"><div class="form-group"><label>Workout Type</label><select name="workout_type"><option>Weight Training</option><option>Cardio</option><option>Yoga</option><option>HIIT</option><option>Zumba</option><option>CrossFit</option><option>Pilates</option><option>Boxing</option></select></div><div class="form-group"><label>Day</label><select name="day_of_week"><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select></div></div>
+<div class="form-row"><div class="form-group"><label>Time Slot</label><select name="time_slot"><option>06:00-07:00</option><option>07:00-08:00</option><option>08:00-09:00</option><option>17:00-18:00</option><option>18:00-19:00</option><option>19:00-20:00</option></select></div><div class="form-group"><label>Capacity</label><input type="number" name="capacity" value="20" min="1"></div></div>
+<div class="form-actions"><a href="{{ url_for('trainer.schedules') }}" class="btn btn-outline">Cancel</a><button type="submit" class="btn btn-primary">Save</button></div></form></div></div>
+{% endblock %}

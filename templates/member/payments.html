@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}My Payments{% endblock %}
+{% block page_title %}Payment History{% endblock %}
+{% block content %}
+<div class="data-card"><div class="table-responsive"><table class="data-table">
+  <thead><tr><th>#</th><th>Amount</th><th>Date</th><th>Mode</th><th>Status</th><th>Notes</th></tr></thead>
+  <tbody>
+    {% for p in payments %}<tr>
+      <td>{{ p.id }}</td>
+      <td><strong class="text-success">&#8377;{{ "{:,.0f}".format(p.amount) }}</strong></td>
+      <td>{{ p.payment_date.strftime('%d %b %Y') if p.payment_date else '' }}</td>
+      <td><span class="badge badge-info">{{ p.payment_mode }}</span></td>
+      <td><span class="badge badge-{{ 'success' if p.status=='Paid' else ('danger' if p.status=='Failed' else 'warning') }}">{{ p.status }}</span></td>
+      <td><small>{{ p.notes or '-' }}</small></td>
+    </tr>{% else %}<tr><td colspan="6" class="empty-row">No payment records found</td></tr>{% endfor %}
+  </tbody>
+</table></div></div>
+{% endblock %}

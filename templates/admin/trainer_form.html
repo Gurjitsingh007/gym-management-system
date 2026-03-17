@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ action }} Trainer — FlexCore{% endblock %}
+{% block page_title %}{{ action }} Trainer{% endblock %}
+{% block content %}
+<div class="page-header animate-in"><h2>{{ action }} Trainer</h2></div>
+<div class="form-card animate-in">
+  <form method="POST">
+    <div class="row g-3">
+      <div class="col-md-6"><label class="gym-label">Full Name *</label><input type="text" name="name" class="gym-input" value="{{ trainer.name if trainer else '' }}" required placeholder="Trainer name"></div>
+      <div class="col-md-6"><label class="gym-label">Specialization</label><input type="text" name="specialization" class="gym-input" value="{{ trainer.specialization if trainer else '' }}" placeholder="e.g. Yoga, Strength Training, Boxing"></div>
+      <div class="col-md-6"><label class="gym-label">Phone</label><input type="text" name="contact_phone" class="gym-input" value="{{ trainer.contact_phone if trainer else '' }}" placeholder="+91 XXXXX XXXXX"></div>
+      <div class="col-md-6"><label class="gym-label">Email</label><input type="email" name="contact_email" class="gym-input" value="{{ trainer.contact_email if trainer else '' }}" placeholder="trainer@gym.com"></div>
+      <div class="col-12"><label class="gym-label">Bio</label><textarea name="bio" class="gym-textarea" rows="4" placeholder="Brief professional background...">{{ trainer.bio if trainer else '' }}</textarea></div>
+    </div>
+    <div class="d-flex gap-2 mt-4">
+      <button type="submit" class="btn-gym btn-primary-gym"><i class="bi bi-check-circle-fill"></i> {{ action }} Trainer</button>
+      <a href="{{ url_for('admin.trainers') }}" class="btn-gym btn-secondary-gym"><i class="bi bi-arrow-left"></i> Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

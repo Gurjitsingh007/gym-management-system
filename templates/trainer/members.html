@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}My Members{% endblock %}
+{% block page_title %}My Members{% endblock %}
+{% block content %}
+<div class="data-card"><div class="table-responsive"><table class="data-table"><thead><tr><th>ID</th><th>Name</th><th>Age/Gender</th><th>Plan</th><th>Joined</th><th>Status</th></tr></thead><tbody>{% for m in members %}<tr><td>{{ m.id }}</td><td><div class="cell-user"><div class="cell-avatar">{{ m.name[0] }}</div><div><strong>{{ m.name }}</strong></div></div></td><td>{{ m.age }}/{{ m.gender }}</td><td>{{ m.plan.plan_name if m.plan else "N/A" }}</td><td>{{ m.join_date.strftime("%d %b %Y") if m.join_date else "" }}</td><td><span class="badge badge-{{ "danger" if m.is_expired else "success" }}">{{ "Expired" if m.is_expired else "Active" }}</span></td></tr>{% else %}<tr><td colspan="6" class="empty-row">No members assigned</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — FitCore Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="login-page">
+  <div class="login-bg"><div class="bg-circle c1"></div><div class="bg-circle c2"></div><div class="bg-circle c3"></div></div>
+  <div class="login-container">
+    <div class="login-brand">
+      <div class="login-logo"><i class="fas fa-dumbbell"></i></div>
+      <h1>JHOTTA <span>Max</span></h1>
+      <p>Gym Management System</p>
+    </div>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}{% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }}" style="margin-bottom:1rem"><i class="fas fa-exclamation-circle"></i> {{ msg }}</div>
+      {% endfor %}{% endif %}
+    {% endwith %}
+    <form method="POST" class="login-form">
+      <div class="form-group">
+        <label>Username</label>
+        <div class="input-icon">
+          <i class="fas fa-user"></i>
+          <input type="text" name="username" placeholder="Enter username" required autofocus>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-icon">
+          <i class="fas fa-lock"></i>
+          <input type="password" name="password" id="passwordInput" placeholder="Enter password" required>
+          <button type="button" class="pass-toggle" onclick="togglePass()"><i class="fas fa-eye" id="eyeIcon"></i></button>
+        </div>
+      </div>
+      <button type="submit" class="btn-login"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+    </form>
+    <div class="login-demo-creds">
+      <p class="demo-title">Demo Credentials</p>
+      <div class="demo-cards">
+        <div class="demo-card" onclick="fillCred('admin','admin123')"><i class="fas fa-shield-alt"></i><span>Admin</span><small>admin / admin123</small></div>
+        <div class="demo-card" onclick="fillCred('trainer1','trainer123')"><i class="fas fa-user-tie"></i><span>Trainer</span><small>trainer1 / trainer123</small></div>
+        <div class="demo-card" onclick="fillCred('member1','member123')"><i class="fas fa-user"></i><span>Member</span><small>member1 / member123</small></div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function togglePass(){const i=document.getElementById('passwordInput'),e=document.getElementById('eyeIcon');if(i.type==='password'){i.type='text';e.className='fas fa-eye-slash';}else{i.type='password';e.className='fas fa-eye';}}
+function fillCred(u,p){document.querySelector('[name=username]').value=u;document.querySelector('[name=password]').value=p;}
+</script>
+</body></html>

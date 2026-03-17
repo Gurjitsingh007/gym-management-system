@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="dashboard">
+  <!-- Stats Cards -->
+  <div class="stats-grid">
+    <div class="stat-card card-blue">
+      <div class="stat-icon"><i class="fas fa-users"></i></div>
+      <div class="stat-info">
+        <div class="stat-value counter" data-target="{{ total_members }}">0</div>
+        <div class="stat-label">Total Members</div>
+        <div class="stat-sub"><i class="fas fa-arrow-up"></i> Active this month</div>
+      </div>
+      <div class="stat-bg-icon"><i class="fas fa-users"></i></div>
+    </div>
+    <div class="stat-card card-green">
+      <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+      <div class="stat-info">
+        <div class="stat-value counter" data-target="{{ total_trainers }}">0</div>
+        <div class="stat-label">Total Trainers</div>
+        <div class="stat-sub"><i class="fas fa-star"></i> Expert coaches</div>
+      </div>
+      <div class="stat-bg-icon"><i class="fas fa-user-tie"></i></div>
+    </div>
+    <div class="stat-card card-orange">
+      <div class="stat-icon"><i class="fas fa-rupee-sign"></i></div>
+      <div class="stat-info">
+        <div class="stat-value">₹{{ "{:,.0f}".format(total_revenue) }}</div>
+        <div class="stat-label">Total Revenue</div>
+        <div class="stat-sub"><i class="fas fa-chart-line"></i> All time earnings</div>
+      </div>
+      <div class="stat-bg-icon"><i class="fas fa-rupee-sign"></i></div>
+    </div>
+    <div class="stat-card card-purple">
+      <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+      <div class="stat-info">
+        <div class="stat-value counter" data-target="{{ today_attendance }}">0</div>
+        <div class="stat-label">Today's Attendance</div>
+        <div class="stat-sub"><i class="fas fa-clock"></i> Check-ins today</div>
+      </div>
+      <div class="stat-bg-icon"><i class="fas fa-calendar-check"></i></div>
+    </div>
+  </div>
+
+  <!-- Alerts -->
+  {% if expiring_soon %}
+  <div class="alert-banner warning">
+    <i class="fas fa-exclamation-triangle"></i>
+    <strong>{{ expiring_soon|length }} membership(s)</strong> expiring within 7 days:
+    {% for m in expiring_soon[:3] %}<a href="{{ url_for('admin.view_member', id=m.id) }}" class="alert-link">{{ m.name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}
+    {% if expiring_soon|length > 3 %} and {{ expiring_soon|length - 3 }} more{% endif %}
+  </div>
+  {% endif %}
+  {% if expired %}
+  <div class="alert-banner danger">
+    <i class="fas fa-times-circle"></i>
+    <strong>{{ expired|length }} membership(s)</strong> have expired. Consider sending renewal reminders.
+  </div>
+  {% endif %}
+
+  <!-- Charts Row -->
+  <div class="charts-row">
+    <div class="chart-card wide">
+      <div class="chart-header">
+        <h3><i class="fas fa-chart-line"></i> Monthly Revenue</h3>
+        <span class="chart-badge">Last 6 Months</span>
+      </div>
+      <canvas id="revenueChart" height="100"></canvas>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3><i class="fas fa-chart-pie"></i> Plan Distribution</h3>
+      </div>
+      <canvas id="planChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3><i class="fas fa-chart-bar"></i> Weekly Attendance</h3>
+        <span class="chart-badge">Last 7 Days</span>
+      </div>
+      <canvas id="attChart" height="200"></canvas>
+    </div>
+    <div class="chart-card wide">
+      <div class="chart-header">
+        <h3><i class="fas fa-clock"></i> Recent Payments</h3>
+        <a href="{{ url_for('admin.payments') }}" class="chart-link">View All</a>
+      </div>
+      <table class="mini-table">
+        <thead><tr><th>Member</th><th>Amount</th><th>Date</th><th>Mode</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for p in recent_payments %}
+          <tr>
+            <td>{{ p.member.name if p.member else 'N/A' }}</td>
+            <td>₹{{ "{:,.0f}".format(p.amount) }}</td>
+            <td>{{ p.payment_date.strftime('%d %b %Y') }}</td>
+            <td>{{ p.payment_mode }}</td>
+            <td><span class="badge badge-{{ 'success' if p.status == 'Paid' else 'warning' }}">{{ p.status }}</span></td>
+          </tr>
+          {% else %}<tr><td colspan="5" class="empty-row">No payments yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Members -->
+  <div class="section-card">
+    <div class="section-header">
+      <h3><i class="fas fa-user-plus"></i> Recently Joined Members</h3>
+      <a href="{{ url_for('admin.members') }}" class="btn btn-sm btn-outline">View All</a>
+    </div>
+    <div class="member-grid">
+      {% for m in recent_members %}
+      <div class="member-mini-card">
+        <div class="member-avatar">{{ m.name[0] }}</div>
+        <div class="member-info">
+          <strong>{{ m.name }}</strong>
+          <span>{{ m.plan.plan_name if m.plan else 'No Plan' }}</span>
+          <span class="badge badge-{{ 'danger' if m.is_expired else 'success' }}">
+            {{ 'Expired' if m.is_expired else 'Active' }}
+          </span>
+        </div>
+        <a href="{{ url_for('admin.view_member', id=m.id) }}" class="btn-icon"><i class="fas fa-eye"></i></a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const labels = {{ monthly_labels | tojson }};
+const revenue = {{ monthly_revenue | tojson }};
+const attLabels = {{ att_labels | tojson }};
+const attData = {{ att_data | tojson }};
+const planLabels = {{ plan_labels | tojson }};
+const planData = {{ plan_data | tojson }};
+
+const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+const gridColor = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.07)';
+const textColor = isDark ? '#a0aec0' : '#6b7280';
+
+new Chart(document.getElementById('revenueChart'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [{
+      label: 'Revenue (₹)',
+      data: revenue,
+      borderColor: '#f97316',
+      backgroundColor: 'rgba(249,115,22,0.15)',
+      borderWidth: 3,
+      fill: true,
+      tension: 0.4,
+      pointBackgroundColor: '#f97316',
+      pointRadius: 5,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: gridColor }, ticks: { color: textColor } },
+      y: { grid: { color: gridColor }, ticks: { color: textColor, callback: v => '₹' + v.toLocaleString() } }
+    }
+  }
+});
+
+new Chart(document.getElementById('planChart'), {
+  type: 'doughnut',
+  data: {
+    labels: planLabels,
+    datasets: [{
+      data: planData,
+      backgroundColor: ['#3b82f6','#10b981','#f97316','#8b5cf6'],
+      borderWidth: 0,
+      hoverOffset: 8
+    }]
+  },
+  options: {
+    responsive: true,
+    cutout: '65%',
+    plugins: {
+      legend: { position: 'bottom', labels: { color: textColor, padding: 12, usePointStyle: true } }
+    }
+  }
+});
+
+new Chart(document.getElementById('attChart'), {
+  type: 'bar',
+  data: {
+    labels: attLabels,
+    datasets: [{
+      label: 'Check-ins',
+      data: attData,
+      backgroundColor: '#8b5cf6',
+      borderRadius: 8,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: textColor } },
+      y: { grid: { color: gridColor }, ticks: { color: textColor, stepSize: 1 } }
+    }
+  }
+});
+
+// Counter animation
+document.querySelectorAll('.counter').forEach(el => {
+  const target = parseInt(el.dataset.target);
+  let count = 0;
+  const step = Math.max(1, Math.floor(target / 40));
+  const timer = setInterval(() => {
+    count = Math.min(count + step, target);
+    el.textContent = count;
+    if (count >= target) clearInterval(timer);
+  }, 30);
+});
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Schedules{% endblock %}
+{% block page_title %}Workout Schedules{% endblock %}
+{% block content %}
+<div class="page-actions">
+  <div></div>
+  <a href="{{ url_for('admin.add_schedule') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Schedule</a>
+</div>
+<div class="schedule-grid">
+  {% for day in ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}
+  {% set day_schedules = schedules | selectattr('day_of_week', 'equalto', day) | list %}
+  {% if day_schedules %}
+  <div class="day-column">
+    <div class="day-header">{{ day }}</div>
+    {% for s in day_schedules %}
+    <div class="schedule-item">
+      <div class="schedule-type">{{ s.workout_type }}</div>
+      <div class="schedule-meta">
+        <span><i class="fas fa-clock"></i> {{ s.time_slot }}</span>
+        <span><i class="fas fa-user-tie"></i> {{ s.trainer.name if s.trainer else 'N/A' }}</span>
+        <span><i class="fas fa-users"></i> Cap: {{ s.capacity }}</span>
+      </div>
+      <form method="POST" action="{{ url_for('admin.delete_schedule', id=s.id) }}" onsubmit="return confirm('Delete schedule?')">
+        <button class="btn-icon btn-delete sm"><i class="fas fa-trash"></i></button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

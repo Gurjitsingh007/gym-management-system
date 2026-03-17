@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Plans{% endblock %}
+{% block page_title %}Membership Plans{% endblock %}
+{% block content %}
+<div class="page-actions">
+  <div></div>
+  <a href="{{ url_for('admin.add_plan') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Plan</a>
+</div>
+<div class="plans-grid">
+  {% for p in plans %}
+  <div class="plan-card">
+    <div class="plan-header">
+      <h3>{{ p.plan_name }}</h3>
+      <span class="plan-duration">{{ p.duration }} Month{{ 's' if p.duration > 1 }}</span>
+    </div>
+    <div class="plan-price">₹{{ "{:,.0f}".format(p.fees) }}</div>
+    <div class="plan-members"><i class="fas fa-users"></i> {{ p.members|length }} members enrolled</div>
+    <div class="plan-benefits">
+      {% for b in p.benefits.split(',') if p.benefits %}<div class="benefit-item"><i class="fas fa-check-circle"></i> {{ b.strip() }}</div>{% endfor %}
+    </div>
+    <div class="card-actions">
+      <a href="{{ url_for('admin.edit_plan', id=p.id) }}" class="btn btn-sm btn-outline"><i class="fas fa-edit"></i> Edit</a>
+      <form method="POST" action="{{ url_for('admin.delete_plan', id=p.id) }}" onsubmit="return confirm('Delete plan?')">
+        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
