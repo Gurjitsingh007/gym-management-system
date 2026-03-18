@@ -99,17 +99,30 @@ def add_member():
         if User.query.filter_by(username=username).first():
             flash('Username already taken.', 'danger')
             return render_template('admin/member_form.html', plans=plans, trainers=trainers)
-        user = User(username=username, email=email,
-                    password=generate_password_hash(request.form['password']), role='member')
+
+        user = User(username=username, email=email, role='member')
+        user.set_password(request.form['password'])
         db.session.add(user)
         db.session.flush()
+
+        # Handle trainer_id safely
+        trainer_id_raw = request.form.get('trainer_id', '').strip()
+        trainer_id = int(trainer_id_raw) if trainer_id_raw else None
+
+        # Handle plan_id safely
+        plan_id_raw = request.form.get('plan_id', '').strip()
+        plan_id = int(plan_id_raw) if plan_id_raw else None
+
         member = Member(
-            name=request.form['name'], age=request.form.get('age', type=int),
-            gender=request.form.get('gender'), contact=request.form.get('contact'),
-            email=email, join_date=date.fromisoformat(request.form.get('join_date', str(date.today()))),
+            name=request.form['name'],
+            age=request.form.get('age', type=int),
+            gender=request.form.get('gender'),
+            contact=request.form.get('contact'),
+            email=email,
+            join_date=date.fromisoformat(request.form.get('join_date', str(date.today()))),
             health_details=request.form.get('health_details'),
-            plan_id=request.form.get('plan_id', type=int),
-            id=request.form.get('id', type=int) or None,
+            plan_id=plan_id,
+            trainer_id=trainer_id,
             user_id=user.id
         )
         db.session.add(member)
@@ -190,7 +203,8 @@ def add_trainer():
         db.session.flush()
         trainer = Trainer(name=request.form['name'],
                           specialization=request.form.get('specialization'),
-                          phone=request.form.get('phone'),
+                          contact_phone=request.form.get('contact_phone'),
+                          contact_email=request.form.get('contact_email'),
                           experience=request.form.get('experience', type=int, default=0),
                           user_id=user.id)
         db.session.add(trainer)
@@ -207,7 +221,8 @@ def edit_trainer(id):
     if request.method == 'POST':
         trainer.name = request.form['name']
         trainer.specialization = request.form.get('specialization')
-        trainer.phone = request.form.get('phone')
+        trainer.contact_phone = request.form.get('contact_phone')
+        trainer.contact_email=request.form.get('contact_email'),
         trainer.experience = request.form.get('experience', type=int, default=0)
         db.session.commit()
         flash('Trainer updated!', 'success')
@@ -355,8 +370,7 @@ def add_attendance():
         db.session.commit()
         flash('Attendance recorded!', 'success')
         return redirect(url_for('admin.attendance'))
-        return render_template('admin/attendance_form.html', members=members, today=str(date.today()))
-
+    return render_template('admin/attendance_form.html', members=members, today=str(date.today()))
 # ─── SCHEDULES ────────────────────────────────────────────────────────────────
 
 @admin_bp.route('/schedules')
@@ -373,8 +387,12 @@ def schedules():
 def add_schedule():
     trainers = Trainer.query.all()
     if request.method == 'POST':
+        trainer_id = request.form.get('trainer_id', type=int)
+        if not trainer_id:
+            flash('Please select a trainer!', 'danger')
+            return render_template('admin/schedule_form.html', trainers=trainers, schedule=None)
         schedule = WorkoutSchedule(
-            id=request.form.get('id', type=int),
+            trainer_id=trainer_id,
             workout_type=request.form.get('workout_type'),
             time_slot=request.form.get('time_slot'),
             day_of_week=request.form.get('day_of_week'),

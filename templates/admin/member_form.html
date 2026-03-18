@@ -1,31 +1,132 @@
-{% extends "base.html" %}
-{% block title %}{{ action }} Member — FlexCore{% endblock %}
-{% block page_title %}{{ action }} Member{% endblock %}
+{% extends 'base.html' %}
+{% block title %}{{ 'Edit' if member else 'Add' }} Member{% endblock %}
+{% block page_title %}{{ 'Edit Member' if member else 'Add New Member' }}{% endblock %}
 {% block content %}
-<div class="page-header animate-in"><h2>{{ action }} Member</h2><p>{% if action == 'Add' %}Register a new gym member{% else %}Update member information{% endif %}</p></div>
-<div class="form-card animate-in">
-  <form method="POST">
-    <div class="row g-3">
-      <div class="col-md-6"><label class="gym-label">Full Name *</label><input type="text" name="name" class="gym-input" value="{{ member.name if member else '' }}" required placeholder="Enter full name"></div>
-      <div class="col-md-3"><label class="gym-label">Age</label><input type="number" name="age" class="gym-input" value="{{ member.age if member else '' }}" min="5" max="100" placeholder="Age"></div>
-      <div class="col-md-3"><label class="gym-label">Gender</label><select name="gender" class="gym-select"><option value="">Select</option><option value="Male" {% if member and member.gender == 'Male' %}selected{% endif %}>Male</option><option value="Female" {% if member and member.gender == 'Female' %}selected{% endif %}>Female</option><option value="Other" {% if member and member.gender == 'Other' %}selected{% endif %}>Other</option></select></div>
-      <div class="col-md-4"><label class="gym-label">Phone</label><input type="text" name="contact_phone" class="gym-input" value="{{ member.contact_phone if member else '' }}" placeholder="+91 XXXXX XXXXX"></div>
-      <div class="col-md-4"><label class="gym-label">Email</label><input type="email" name="contact_email" class="gym-input" value="{{ member.contact_email if member else '' }}" placeholder="member@email.com"></div>
-      <div class="col-md-4"><label class="gym-label">Join Date *</label><input type="date" name="join_date" class="gym-input" value="{{ member.join_date.isoformat() if member and member.join_date else '' }}" required></div>
-      <div class="col-md-8"><label class="gym-label">Address</label><input type="text" name="contact_address" class="gym-input" value="{{ member.contact_address if member else '' }}" placeholder="Full address"></div>
-      <div class="col-md-4"><label class="gym-label">Membership Plan</label><select name="plan_id" class="gym-select" id="planSelect"><option value="">No Plan</option>{% for p in plans %}<option value="{{ p.plan_id }}" data-fee="{{ p.fees }}" {% if member and member.plan_id == p.plan_id %}selected{% endif %}>{{ p.plan_name }} — Rs.{{ p.fees|int }}</option>{% endfor %}</select></div>
-      {% if action == 'Add' %}
-      <div class="col-md-4"><label class="gym-label">Payment Mode</label><select name="payment_mode" class="gym-select"><option>Cash</option><option>UPI</option><option>Card</option><option>Online</option></select></div>
-      {% endif %}
-      {% if action == 'Edit' %}
-      <div class="col-md-4"><label class="gym-label">Status</label><select name="is_active" class="gym-select"><option value="1" {% if member and member.is_active %}selected{% endif %}>Active</option><option value="" {% if member and not member.is_active %}selected{% endif %}>Inactive</option></select></div>
-      {% endif %}
-      <div class="col-12"><label class="gym-label">Health Details</label><textarea name="health_details" class="gym-textarea" rows="3" placeholder="Existing conditions, medications, allergies...">{{ member.health_details if member else '' }}</textarea></div>
+
+<div class="form-page">
+  <div class="form-card">
+
+    <div class="form-card-header">
+      <i class="fas fa-user-plus"></i>
+      <h2>{{ 'Edit Member' if member else 'Add New Member' }}</h2>
     </div>
-    <div class="d-flex gap-2 mt-4">
-      <button type="submit" class="btn-gym btn-primary-gym"><i class="bi bi-check-circle-fill"></i> {{ action }} Member</button>
-      <a href="{{ url_for('admin.members') }}" class="btn-gym btn-secondary-gym"><i class="bi bi-arrow-left"></i> Cancel</a>
-    </div>
-  </form>
+
+    <form method="POST">
+
+      {% if not member %}
+      <div class="form-section">
+        <h4><i class="fas fa-lock"></i> Login Credentials</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Username *</label>
+            <input type="text" name="username" required placeholder="e.g. john_doe">
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" name="email" required placeholder="email@example.com">
+          </div>
+          <div class="form-group">
+            <label>Password *</label>
+            <input type="password" name="password" required placeholder="Min 6 characters">
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="form-section">
+        <h4><i class="fas fa-user"></i> Personal Information</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Full Name *</label>
+            <input type="text" name="name" required
+              value="{{ member.name if member else '' }}"
+              placeholder="Enter full name">
+          </div>
+          <div class="form-group">
+            <label>Age</label>
+            <input type="number" name="age" min="10" max="100"
+              value="{{ member.age if member else '' }}"
+              placeholder="Age">
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <select name="gender">
+              <option value="">Select Gender</option>
+              <option value="Male"   {{ 'selected' if member and member.gender == 'Male' }}>Male</option>
+              <option value="Female" {{ 'selected' if member and member.gender == 'Female' }}>Female</option>
+              <option value="Other"  {{ 'selected' if member and member.gender == 'Other' }}>Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Contact / Phone</label>
+            <input type="text" name="contact"
+              value="{{ member.contact if member else '' }}"
+              placeholder="Phone number">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email"
+              value="{{ member.email if member else '' }}"
+              placeholder="email@example.com">
+          </div>
+          <div class="form-group">
+            <label>Join Date</label>
+            <input type="date" name="join_date"
+              value="{{ member.join_date.isoformat() if member and member.join_date else '' }}">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4><i class="fas fa-tag"></i> Membership Details</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Membership Plan *</label>
+            <select name="plan_id" required>
+              <option value="">Select Plan</option>
+              {% for p in plans %}
+              <option value="{{ p.id }}" {{ 'selected' if member and member.plan_id == p.id }}>
+                {{ p.plan_name }} — {{ p.duration }} months — Rs.{{ p.fees }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Assign Trainer</label>
+            <select name="trainer_id">
+              <option value="">No Trainer</option>
+              {% for t in trainers %}
+              <option value="{{ t.id }}" {{ 'selected' if member and member.trainer_id == t.id }}>
+                {{ t.name }} — {{ t.specialization }}
+              </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4><i class="fas fa-heartbeat"></i> Health Details</h4>
+        <div class="form-group">
+          <label>Health Notes</label>
+          <textarea name="health_details" rows="3"
+            placeholder="Any health conditions, injuries, medical notes...">{{ member.health_details if member else '' }}</textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="{{ url_for('admin.members') }}" class="btn btn-outline">
+          <i class="fas fa-times"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> {{ 'Update Member' if member else 'Add Member' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
 </div>
+
 {% endblock %}

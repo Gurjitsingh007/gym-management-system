@@ -2,44 +2,89 @@
 {% block title %}Add Schedule{% endblock %}
 {% block page_title %}Add Workout Schedule{% endblock %}
 {% block content %}
+
 <div class="form-page">
   <div class="form-card">
-    <div class="form-card-header"><i class="fas fa-clock"></i><h2>Add Workout Schedule</h2></div>
+
+    <div class="form-card-header">
+      <i class="fas fa-clock"></i>
+      <h2>Add Workout Schedule</h2>
+    </div>
+
     <form method="POST">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Trainer *</label>
-          <select name="id" required>
-            <option value="">Select Trainer</option>
-            {% for t in trainers %}<option value="{{ t.id }}">{{ t.name }} — {{ t.specialization }}</option>{% endfor %}
-          </select>
+      <div class="form-section">
+        <h4><i class="fas fa-user-tie"></i> Trainer & Workout</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Select Trainer *</label>
+            <select name="trainer_id" required>
+              <option value="">-- Select Trainer --</option>
+              {% for t in trainers %}
+              <option value="{{ t.id }}">{{ t.name }} — {{ t.specialization }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Workout Type</label>
+            <select name="workout_type">
+              <option value="Weight Training">Weight Training</option>
+              <option value="Cardio">Cardio</option>
+              <option value="Yoga">Yoga</option>
+              <option value="HIIT">HIIT</option>
+              <option value="Zumba">Zumba</option>
+              <option value="CrossFit">CrossFit</option>
+              <option value="Pilates">Pilates</option>
+              <option value="Boxing">Boxing</option>
+              <option value="Swimming">Swimming</option>
+              <option value="Cycling">Cycling</option>
+            </select>
+          </div>
         </div>
-        <div class="form-group"><label>Workout Type</label>
-          <select name="workout_type">
-            {% for wt in ['Weight Training','Cardio','Yoga','HIIT','Zumba','CrossFit','Pilates','Boxing','Swimming','Cycling'] %}
-            <option>{{ wt }}</option>{% endfor %}
-          </select>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Day of Week</label>
+            <select name="day_of_week">
+              <option value="Monday">Monday</option>
+              <option value="Tuesday">Tuesday</option>
+              <option value="Wednesday">Wednesday</option>
+              <option value="Thursday">Thursday</option>
+              <option value="Friday">Friday</option>
+              <option value="Saturday">Saturday</option>
+              <option value="Sunday">Sunday</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Time Slot</label>
+            <select name="time_slot">
+              <option value="06:00-07:00">06:00 - 07:00</option>
+              <option value="07:00-08:00">07:00 - 08:00</option>
+              <option value="08:00-09:00">08:00 - 09:00</option>
+              <option value="09:00-10:00">09:00 - 10:00</option>
+              <option value="10:00-11:00">10:00 - 11:00</option>
+              <option value="17:00-18:00">17:00 - 18:00</option>
+              <option value="18:00-19:00">18:00 - 19:00</option>
+              <option value="19:00-20:00">19:00 - 20:00</option>
+              <option value="20:00-21:00">20:00 - 21:00</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Capacity</label>
+            <input type="number" name="capacity" value="20" min="1" max="100">
+          </div>
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label>Day of Week</label>
-          <select name="day_of_week">
-            {% for d in ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'] %}<option>{{ d }}</option>{% endfor %}
-          </select>
-        </div>
-        <div class="form-group"><label>Time Slot</label>
-          <select name="time_slot">
-            {% for s in ['06:00-07:00','07:00-08:00','08:00-09:00','09:00-10:00','10:00-11:00','17:00-18:00','18:00-19:00','19:00-20:00','20:00-21:00'] %}<option>{{ s }}</option>{% endfor %}
-          </select>
-        </div>
-        <div class="form-group"><label>Capacity</label><input type="number" name="capacity" value="20" min="1" max="100"></div>
-      </div>
+
       <div class="form-actions">
-        <a href="{{ url_for('admin.schedules') }}" class="btn btn-outline">Cancel</a>
-        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Schedule</button>
+        <a href="{{ url_for('admin.schedules') }}" class="btn btn-outline">
+          <i class="fas fa-times"></i> Cancel
+        </a>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Save Schedule
+        </button>
       </div>
     </form>
+
   </div>
 </div>
+
 {% endblock %}

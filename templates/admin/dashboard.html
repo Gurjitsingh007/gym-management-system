@@ -66,13 +66,17 @@
         <h3><i class="fas fa-chart-line"></i> Monthly Revenue</h3>
         <span class="chart-badge">Last 6 Months</span>
       </div>
-      <canvas id="revenueChart" height="100"></canvas>
+      <div style="height:200px; position:relative;">
+        <canvas id="revenueChart"></canvas>
+      </div>
     </div>
     <div class="chart-card">
       <div class="chart-header">
         <h3><i class="fas fa-chart-pie"></i> Plan Distribution</h3>
       </div>
-      <canvas id="planChart" height="200"></canvas>
+      <div style="height:200px; position:relative;">
+        <canvas id="planChart"></canvas>
+      </div>
     </div>
   </div>
 
@@ -82,7 +86,9 @@
         <h3><i class="fas fa-chart-bar"></i> Weekly Attendance</h3>
         <span class="chart-badge">Last 7 Days</span>
       </div>
-      <canvas id="attChart" height="200"></canvas>
+      <div style="height:200px; position:relative;">
+        <canvas id="attChart"></canvas>
+      </div>
     </div>
     <div class="chart-card wide">
       <div class="chart-header">
@@ -162,6 +168,7 @@ new Chart(document.getElementById('revenueChart'), {
   },
   options: {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: { legend: { display: false } },
     scales: {
       x: { grid: { color: gridColor }, ticks: { color: textColor } },
@@ -183,6 +190,7 @@ new Chart(document.getElementById('planChart'), {
   },
   options: {
     responsive: true,
+    maintainAspectRatio: false,
     cutout: '65%',
     plugins: {
       legend: { position: 'bottom', labels: { color: textColor, padding: 12, usePointStyle: true } }
@@ -204,6 +212,7 @@ new Chart(document.getElementById('attChart'), {
   },
   options: {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: { legend: { display: false } },
     scales: {
       x: { grid: { display: false }, ticks: { color: textColor } },

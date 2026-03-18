@@ -228,16 +228,32 @@ input, select, textarea, button { font-family: inherit; }
 .card-purple .stat-icon { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
 .card-purple { border-top: 3px solid var(--accent-purple); }
 
+/* ── Chart Layout ── */
 .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
-.charts-row:nth-child(odd) { grid-template-columns: 1fr 2fr; }
-.chart-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-.chart-card.wide { }
+.charts-row.reverse { grid-template-columns: 1fr 2fr; }
+.chart-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px;
+}
 .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
 .chart-header h3 { font-size: 15px; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
 .chart-header h3 i { color: var(--accent-blue); }
 .chart-badge { font-size: 11px; background: var(--bg-hover); color: var(--text-muted); padding: 3px 8px; border-radius: 20px; border: 1px solid var(--border); }
 .chart-link { font-size: 12px; color: var(--accent-blue); }
 .chart-link:hover { text-decoration: underline; }
+
+/* ── FIXED CHART SIZES ── */
+.chart-box {
+  position: relative;
+  height: 220px;
+  width: 100%;
+}
+.chart-box canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
 
 .section-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
 .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -369,8 +385,7 @@ input, select, textarea, button { font-family: inherit; }
 .trainer-card {
   background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 24px 20px; text-align: center;
-  transition: all var(--transition);
-  position: relative; overflow: hidden;
+  transition: all var(--transition); position: relative; overflow: hidden;
 }
 .trainer-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent-green), var(--accent-blue)); }
 .trainer-card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
@@ -505,7 +520,19 @@ input, select, textarea, button { font-family: inherit; }
 .input-icon i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; pointer-events: none; }
 .input-icon input { width: 100%; padding: 12px 14px 12px 40px; background: var(--bg-primary); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text-primary); font-size: 14px; outline: none; transition: border-color var(--transition), box-shadow var(--transition); }
 .input-icon input:focus { border-color: var(--accent-blue); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-.pass-toggle { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 5px; }
+.pass-toggle { 
+  position: absolute; 
+  right: 31px; 
+  top: 50%; 
+  transform: translateY(-50%); 
+  background: none; 
+  border: none; 
+  color: var(--text-muted); 
+  cursor: pointer; 
+  padding: 5px;
+  z-index: 10;
+  pointer-events:all;
+}
 .pass-toggle:hover { color: var(--text-primary); }
 .btn-login { width: 100%; padding: 13px; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all var(--transition); margin-top: 4px; }
 .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.4); }
@@ -522,7 +549,7 @@ input, select, textarea, button { font-family: inherit; }
    RESPONSIVE
 ══════════════════════════════════════════════ */
 @media (max-width: 1024px) {
-  .charts-row, .charts-row:nth-child(odd) { grid-template-columns: 1fr; }
+  .charts-row, .charts-row.reverse { grid-template-columns: 1fr; }
   .detail-tabs { grid-template-columns: 1fr; }
 }
 @media (max-width: 768px) {

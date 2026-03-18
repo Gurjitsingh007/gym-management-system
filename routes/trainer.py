@@ -20,7 +20,7 @@ def trainer_required(f):
 @login_required
 @trainer_required
 def dashboard():
-    trainer = current_user.trainer
+    trainer = Trainer.query.filter_by(user_id=current_user.id).first()
     members = Member.query.filter_by(id=trainer.id).all() if trainer else []
     schedules = WorkoutSchedule.query.filter_by(id=trainer.id).all() if trainer else []
     today_att = Attendance.query.filter_by(date=date.today()).count()
@@ -31,7 +31,7 @@ def dashboard():
 @login_required
 @trainer_required
 def members():
-    trainer = current_user.trainer
+    trainer = Trainer.query.filter_by(user_id=current_user.id).first()
     members = Member.query.filter_by(id=trainer.id).all() if trainer else []
     return render_template('trainer/members.html', members=members, trainer=trainer)
 
@@ -39,7 +39,7 @@ def members():
 @login_required
 @trainer_required
 def schedules():
-    trainer = current_user.trainer
+    trainer = Trainer.query.filter_by(user_id=current_user.id).first()
     schedules = WorkoutSchedule.query.filter_by(id=trainer.id).all() if trainer else []
     return render_template('trainer/schedules.html', schedules=schedules, trainer=trainer)
 
@@ -47,10 +47,13 @@ def schedules():
 @login_required
 @trainer_required
 def add_schedule():
-    trainer = current_user.trainer
-    if request.method == 'POST' and trainer:
+    trainer = Trainer.query.filter_by(user_id=current_user.id).first()
+    if not trainer:
+        flash('Trainer profile not found!', 'danger')
+        return redirect(url_for('trainer.schedules'))
+    if request.method == 'POST':
         schedule = WorkoutSchedule(
-            id=trainer.id,
+            trainer_id=trainer.id,
             workout_type=request.form.get('workout_type'),
             time_slot=request.form.get('time_slot'),
             day_of_week=request.form.get('day_of_week'),
